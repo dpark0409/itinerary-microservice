@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Itinerary API</title>
+</head>
+
+<body>
+    <div>
+        <form id="itineraryForm">
+            <label htmlFor="title">Title: </label>
+            <input type="text" id="title" name="title" />
+            <br />
+            <label htmlFor="location">Location: </label>
+            <input type="text" id="location" name="location" />
+            <br />
+            <label htmlFor="dateFrom">Date From </label>
+            <input type="date" id="dateFrom" name="dateFrom" />
+            <br />
+            <label htmlFor="dateTo">Date To </label>
+            <input type="date" id="dateTo" name="dateTo" />
+            <br />
+            <button type="submit">Add</button>
+        </form>
+
+        <!-- Retrieve -->
+        <button id="retrieveItineraries">Retrieve Itineraries</button>
+        <div id="itinerariesContainer"></div>
+
+
+    </div>
+    <script>
+        // JavaScript code to handle form submission
+        document.getElementById('itineraryForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // get the form data and convert it to an object
+            const formData = new FormData(event.target);
+            const itinerary = Object.fromEntries(formData.entries());
+
+            // send a POST request to the server with user's data
+            const response = await fetch('http://localhost:3001/api/itineraries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(itinerary)
+            });
+
+            // display a message to the user if sucessful
+            if (response.status === 201) {
+                alert('Itinerary added successfully');
+            } else {
+                alert('Error adding itinerary');
+            }
+            
+            // reset the form
+            event.target.reset();
+        });
+
+        // Javascript code for retrieving the data
+        document.getElementById('retrieveItineraries').addEventListener('click', async () => {
+        
+        // send a Get request
+        const response = await fetch('http://localhost:3001/api/itineraries');
+        const itineraries = await response.json();
+        
+        // display the data on a web page
+        const itinerariesContainer = document.getElementById('itinerariesContainer');
+
+        itinerariesContainer.innerHTML = '';
+        
+        // loop through the itineraries and display it
+        itineraries.forEach((itinerary, index) => {
+            const itineraryElement = document.createElement('div');
+            itineraryElement.innerHTML = `
+            <h2>${itinerary.title}</h2>
+            <p>Location: ${itinerary.location}</p>
+            <p>Date From: ${itinerary.dateFrom}</p>
+            <p>Date To: ${itinerary.dateTo}</p>
+            `;
+            itinerariesContainer.appendChild(itineraryElement);
+        });
+        });
+
+    </script>
+</body>
+
+</html>
